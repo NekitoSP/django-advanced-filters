@@ -2,26 +2,39 @@
 
 <script type="text/javascript">
 	// globals
-	var _af_handlers = window._af_handlers || null;
-	var ADVANCED_FILTER_CHOICES_LOOKUP_URL = "{% url 'afilters_get_field_choices' %}";
+    var ADVANCED_FILTER_CHOICES_LOOKUP_URL = "{% url 'afilters_get_field_choices' %}";
 
-	// common advanced filter tabular form initialization
+    var formset_prefix = "{{ formset.prefix }}";
+    var static_prefix = '{% static "admin/" %}';
+    var add_button_text = "{% trans 'Add another filter' %}";
+    var remove_button_text = "{% trans 'Remove' %}";
+
+    // common advanced filter tabular form initialization
 	(function($) {
-		$("#{{ formset.prefix }}-group > tbody > tr")
+		$("#" + formset_prefix + "-group > tbody > tr")
 			.tabularFormset({
-				prefix: "{{ formset.prefix }}",
-				adminStaticPrefix: '{% static "admin/" %}',
-				addText: "{% trans "Add another filter" %}",
-				deleteText: "{% trans 'Remove' %}",
+				prefix: formset_prefix,
+				adminStaticPrefix: static_prefix,
+				addText: add_button_text,
+				deleteText: remove_button_text,
 				added: function(row) {
-					if (_af_handlers) _af_handlers.init();  // re-init
-
+				    let advanced_row = new AdvancedFiltersRow(jQuery, row);
+				    advanced_row.init();
 					// call original "added" callback
 					$.fn.tabularFormset.default_added(row);
 				},
-				preAdded: function(row) {
-					if (_af_handlers) _af_handlers.destroy();  // cleanup
-				}
-		});
+                removed: function(row) {
+				    let advanced_row = new AdvancedFiltersRow(jQuery, row);
+				    advanced_row.destroy();
+                }
+		})
+        .each(function(){
+            if ($(this).hasClass('empty-form') === false) {
+                let advanced_row = new AdvancedFiltersRow(jQuery, this);
+                advanced_row.init();
+            }
+        });
+
+
 	})(django.jQuery);
 </script>

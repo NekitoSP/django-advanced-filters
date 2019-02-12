@@ -230,16 +230,17 @@ class AdvancedFilterForm(CleanWhiteSpacesMixin, forms.ModelForm):
     class Media:
         required_js = [
             'admin/js/%sjquery.min.js' % ('vendor/jquery/' if USE_VENDOR_DIR else ''),
+            'admin/js/jquery.init.js',
             'advanced-filters/jquery_adder.js',
+            'bootstrap/bootstrap.min.js',
             'orig_inlines%s.js' % ('' if settings.DEBUG else '.min'),
-            'magnific-popup/jquery.magnific-popup.js',
             'advanced-filters/advanced-filters.js',
         ]
         js = required_js + [SELECT2_JS]
         css = {'screen': [
             SELECT2_CSS,
+            'bootstrap/bootstrap.min.css',
             'advanced-filters/advanced-filters.css',
-            'magnific-popup/magnific-popup.css'
         ]}
 
     def get_fields_from_model(self, model, fields):
