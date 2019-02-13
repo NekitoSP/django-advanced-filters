@@ -35,10 +35,12 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		};
 
 		self.row.addClass(ADVANCED_FILTER_ROW_CLASS);
-		self.query_field_name.on('input', function(){
+		self.query_field_name.select2({dropdownParent: $(self.row),});
+		self.query_field_name.on('change', function(){
 			self.on_field_name_changed()
 		});
-		self.operator_select.on('input', function(){
+		self.operator_select.select2({dropdownParent: $(self.row),});
+		self.operator_select.on('change', function(){
             self.on_operator_changed()
         });
 		self.on_field_name_changed(true);
@@ -60,16 +62,17 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		let previous_is_or = previous_value === OR_VALUE;
 		let current_is_or = current_value === OR_VALUE;
 		let is_changed = previous_is_or !== current_is_or;
-
 		if (is_changed){
 			if (current_is_or){
 				self.operator_select
+					.select2('destroy')
 					.val('icontains')
 					.prop("disabled", true);
 				self.on_operator_changed(true);
 				self.query_value.prop("disabled", true)
 			} else {
 				self.operator_select
+					.select2({dropdownParent: $(self.row),})
 					.prop("disabled", false);
 				self.on_operator_changed(true);
 				self.query_value.prop("disabled", false)
