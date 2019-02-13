@@ -16,6 +16,7 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 	};
 
 	self.init = function () {
+
 		if (self.row.hasClass(ADVANCED_FILTER_ROW_CLASS)){
 			console.error('Row already initialized!');
 			return;
@@ -134,16 +135,27 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 
 		let choices_url = ADVANCED_FILTER_CHOICES_LOOKUP_URL + (FORM_MODEL || MODEL_LABEL) + '/' + field_name;
 		$.get(choices_url, function(data) {
+			self.log('choices response', {choices_url: choices_url, data: data});
 			let query_value_clone = self.query_value.clone()
 				.addClass('select2_query')
 				.show();
 			self.query_value.parent().append(query_value_clone);
 			query_value_clone.select2({
-				// multiple: true, TODO: подумать над возможностью мультивыбора для типа "One Of"
-				'data': data,
-				'createSearchChoice': function(term) {
-                	return { 'id': term, 'text': term };
-            	}
+				dropdownParent: $(self.row),
+				// multiple: true, //TODO: подумать над возможностью мультивыбора для типа "One Of"
+				data: data.results,
+				createTag: function (params) {
+					let term = $.trim(params.term);
+					if (term === '') {
+						return null;
+					}
+
+					return {
+					  id: term,
+					  text: term,
+					  newTag: true
+					}
+				},
 			});
 		}).fail(function() {
 			self.initialize_default();

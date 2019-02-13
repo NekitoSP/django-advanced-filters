@@ -18,19 +18,19 @@
 				addText: add_button_text,
 				deleteText: remove_button_text,
 				added: function(row) {
-				    let advanced_row = new AdvancedFiltersRow(jQuery, row);
+				    let advanced_row = new AdvancedFiltersRow($, row);
 				    advanced_row.init();
 					// call original "added" callback
 					$.fn.tabularFormset.default_added(row);
 				},
                 removed: function(row) {
-				    let advanced_row = new AdvancedFiltersRow(jQuery, row);
+				    let advanced_row = new AdvancedFiltersRow($, row);
 				    advanced_row.destroy();
                 }
 		})
         .each(function(){
             if ($(this).hasClass('empty-form') === false) {
-                let advanced_row = new AdvancedFiltersRow(jQuery, this);
+                let advanced_row = new AdvancedFiltersRow($, this);
                 advanced_row.init();
             }
         });

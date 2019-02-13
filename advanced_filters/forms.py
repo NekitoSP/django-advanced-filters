@@ -29,8 +29,8 @@ USE_VENDOR_DIR = django.VERSION >= (1, 9)
 logger = logging.getLogger('advanced_filters.forms')
 
 # select2 location can be modified via settings
-SELECT2_JS = getattr(settings, 'SELECT2_JS', 'select2/select2.min.js')
-SELECT2_CSS = getattr(settings, 'SELECT2_CSS', 'select2/select2.min.css')
+SELECT2_JS = getattr(settings, 'SELECT2_JS', 'admin/js/vendor/select2/select2.full.min.js')
+SELECT2_CSS = getattr(settings, 'SELECT2_CSS', 'admin/css/vendor/select2/select2.min.css')
 
 
 def date_to_string(timestamp):
@@ -229,8 +229,6 @@ class AdvancedFilterForm(CleanWhiteSpacesMixin, forms.ModelForm):
 
     class Media:
         required_js = [
-            'admin/js/%sjquery.min.js' % ('vendor/jquery/' if USE_VENDOR_DIR else ''),
-            'admin/js/jquery.init.js',
             'advanced-filters/jquery_adder.js',
             'bootstrap/bootstrap.min.js',
             'orig_inlines%s.js' % ('' if settings.DEBUG else '.min'),
