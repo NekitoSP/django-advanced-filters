@@ -347,12 +347,15 @@ class AdvancedFilterForm(CleanWhiteSpacesMixin, forms.ModelForm):
                     AdvancedFilterQueryForm._parse_query_dict(
                         field_data, model))
 
-        formset = AFQFormSetNoExtra if not extra else AFQFormSet
+        formset = self.get_afq_formset_class(extra)
         self.fields_formset = formset(
             data=data,
             initial=forms or None,
             model_fields=model_fields
         )
+
+    def get_afq_formset_class(self, extra, **kwargs):
+        return AFQFormSetNoExtra if not extra else AFQFormSet
 
     def save(self, commit=True):
         self.instance.query = self.generate_query()
