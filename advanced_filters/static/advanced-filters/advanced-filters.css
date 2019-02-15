@@ -9,3 +9,7 @@
 .select2-container {
     min-width: 166px;
 }
+
+tr.form-row:not(.empty-form) {
+	display: table-row;
+}

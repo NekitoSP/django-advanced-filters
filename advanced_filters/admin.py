@@ -56,7 +56,11 @@ class AdminAdvancedFiltersMixin(object):
             self.original_change_list_template = "admin/change_list.html"
         self.change_list_template = self.advanced_change_list_template
         # add list filters to filters
-        self.list_filter = (AdvancedListFilters,) + tuple(self.list_filter)
+        filter_class = self.get_advanced_list_filter_class()
+        self.list_filter = (filter_class,) + tuple(self.list_filter)
+
+    def get_advanced_list_filter_class(self):
+        return AdvancedListFilters
 
     def save_advanced_filter(self, request, form):
         if form.is_valid():

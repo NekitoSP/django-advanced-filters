@@ -185,6 +185,10 @@ class AdvancedFilterQueryForm(CleanWhiteSpacesMixin, forms.Form):
         if not self.fields['field'].initial:
             self.fields['field'].initial = self.FIELD_CHOICES[0]
 
+    def deletion_field(self):
+        from django.forms.formsets import DELETION_FIELD_NAME
+        return self.fields[DELETION_FIELD_NAME]
+
 
 class AdvancedFilterFormSet(BaseFormSet):
     """ """
@@ -194,9 +198,10 @@ class AdvancedFilterFormSet(BaseFormSet):
     def __init__(self, *args, **kwargs):
         self.model_fields = kwargs.pop('model_fields', {})
         super(AdvancedFilterFormSet, self).__init__(*args, **kwargs)
-        if self.forms:
-            form = self.forms[0]
-            self.fields = form.visible_fields()
+        empty_form = self.empty_form or self.forms[0]
+        if empty_form:
+            self.deletion_field = empty_form.deletion_field
+            self.fields = empty_form.visible_fields()
 
     def get_form_kwargs(self, index):
         kwargs = super(AdvancedFilterFormSet, self).get_form_kwargs(index)
@@ -228,13 +233,16 @@ class AdvancedFilterForm(CleanWhiteSpacesMixin, forms.ModelForm):
         fields = ('title',)
 
     class Media:
-        required_js = [
+        extra = '' if settings.DEBUG else '.min'
+        js = [
+            'admin/js/%sjquery%s.js' % ('vendor/jquery/' if USE_VENDOR_DIR else '', extra),
+            SELECT2_JS,
+            'admin/js/jquery.init.js',
             'advanced-filters/jquery_adder.js',
             'bootstrap/bootstrap.min.js',
             'orig_inlines%s.js' % ('' if settings.DEBUG else '.min'),
             'advanced-filters/advanced-filters.js',
         ]
-        js = required_js + [SELECT2_JS]
         css = {'screen': [
             SELECT2_CSS,
             'bootstrap/bootstrap.min.css',
