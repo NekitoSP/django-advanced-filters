@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-18 15:19+0500\n"
+"POT-Creation-Date: 2019-02-18 15:49+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,6 +92,10 @@ msgstr "Значение"
 msgid "Negate"
 msgstr "Отрицание"
 
+#: .\forms.py:315
+msgid "Error validating filter forms"
+msgstr "В одном или более фильтров присутствуют ошибки"
+
 #: .\models.py:18 .\templates\admin\advanced_filters.html:17
 msgid "Advanced Filter"
 msgstr "Расширенный фильтр"
@@ -109,10 +113,8 @@ msgid "Created by"
 msgstr "Создано"
 
 #: .\models.py:28
-#, fuzzy
-#| msgid "Greater Than"
 msgid "Created at"
-msgstr "Больше"
+msgstr "Создано в"
 
 #: .\models.py:29
 msgid "URL"
@@ -125,6 +127,10 @@ msgstr "Пользователи"
 #: .\models.py:31
 msgid "Groups"
 msgstr "Группы"
+
+#: .\models.py:36
+msgid "Model"
+msgstr "Модель"
 
 #: .\templates\admin\advanced_filters.html:21
 msgid "Edit"
@@ -154,6 +160,3 @@ msgstr "Добавить ещё один фильтр"
 #: .\templates\admin\common_js_init.html:10
 msgid "Remove"
 msgstr "Удалить"
-
-msgid "Error validating filter forms"
-msgstr "В одном или более фильтров присутствуют ошибки"

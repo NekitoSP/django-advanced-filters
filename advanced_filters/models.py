@@ -33,7 +33,7 @@ class AdvancedFilter(models.Model):
     objects = UserLookupManager()
 
     b64_query = models.CharField(max_length=2048)
-    model = models.CharField(max_length=64, blank=True, null=True)
+    model = models.CharField(max_length=64, blank=True, null=True, verbose_name=_('Model'))
 
     @property
     def query(self):
