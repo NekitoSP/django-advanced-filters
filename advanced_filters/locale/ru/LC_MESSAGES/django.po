@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-11 18:34+0300\n"
+"POT-Creation-Date: 2019-02-18 15:19+0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,99 +20,140 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: admin.py:24
+#: .\admin.py:19
 msgid "Advanced filters"
 msgstr "Расширенные фильтры"
 
-#: admin.py:76
+#: .\admin.py:74
 msgid "Advanced filter added successfully."
 msgstr "Расширенный фильтр успешно создан"
 
-#: forms.py:51
+#: .\forms.py:46
 msgid "Equals"
 msgstr "Равно"
 
-#: forms.py:52
+#: .\forms.py:47
 msgid "Contains"
 msgstr "Содержит"
 
-#: forms.py:53
+#: .\forms.py:48
 msgid "One of"
 msgstr "Одно из"
 
-#: forms.py:54
+#: .\forms.py:49
 msgid "DateTime Range"
 msgstr "Временной диапазон"
 
-#: forms.py:55
+#: .\forms.py:50
 msgid "Is NULL"
 msgstr "Является NULL"
 
-#: forms.py:56
+#: .\forms.py:51
 msgid "Is TRUE"
 msgstr "Является TRUE"
 
-#: forms.py:57
+#: .\forms.py:52
 msgid "Is FALSE"
 msgstr "Является FALSE"
 
-#: forms.py:58
+#: .\forms.py:53
 msgid "Less Than"
 msgstr "Меньше"
 
-#: forms.py:59
+#: .\forms.py:54
 msgid "Greater Than"
 msgstr "Больше"
 
-#: forms.py:60
+#: .\forms.py:55
 msgid "Less Than or Equal To"
 msgstr "Меньше либо равно"
 
-#: forms.py:61
+#: .\forms.py:56
 msgid "Greater Than or Equal To"
 msgstr "Больше либо равно"
 
-#: forms.py:65
+#: .\forms.py:60
 msgid "Or (mark an or between blocks)"
 msgstr "Или (используйте на блоке или между ними"
 
-#: models.py:18 templates/admin/advanced_filters.html:16
+#: .\forms.py:64
+msgid "Field"
+msgstr "Поле"
+
+#: .\forms.py:66
+msgid "Operator"
+msgstr "Оператор"
+
+#: .\forms.py:70
+msgid "Value"
+msgstr "Значение"
+
+#: .\forms.py:75
+msgid "Negate"
+msgstr "Отрицание"
+
+#: .\models.py:18 .\templates\admin\advanced_filters.html:17
 msgid "Advanced Filter"
 msgstr "Расширенный фильтр"
 
-#: models.py:19
+#: .\models.py:19
 msgid "Advanced Filters"
 msgstr "Расширенные фильтры"
 
-#: templates/admin/advanced_filters.html:16
+#: .\models.py:21
+msgid "Title"
+msgstr "Заголовок"
+
+#: .\models.py:25
+msgid "Created by"
+msgstr "Создано"
+
+#: .\models.py:28
+#, fuzzy
+#| msgid "Greater Than"
+msgid "Created at"
+msgstr "Больше"
+
+#: .\models.py:29
+msgid "URL"
+msgstr "URL"
+
+#: .\models.py:30
+msgid "Users"
+msgstr "Пользователи"
+
+#: .\models.py:31
+msgid "Groups"
+msgstr "Группы"
+
+#: .\templates\admin\advanced_filters.html:21
 msgid "Edit"
 msgstr "Редактировать"
 
-#: templates/admin/advanced_filters.html:28
+#: .\templates\admin\advanced_filters.html:37
 msgid "Create advanced filter"
 msgstr "Создать расширенный фильтр"
 
-#: templates/admin/advanced_filters.html:67
+#: .\templates\admin\advanced_filters.html:89
 msgid "Save"
 msgstr "Сохранить"
 
-#: templates/admin/advanced_filters.html:68
-#: templates/admin/advanced_filters/change_form.html:53
+#: .\templates\admin\advanced_filters.html:90
+#: .\templates\admin\advanced_filters\change_form.html:52
 msgid "Save & Filter Now!"
 msgstr "Сохранить и отфильтровать сейчас"
 
-#: templates/admin/advanced_filters.html:69
+#: .\templates\admin\advanced_filters.html:92
 msgid "Cancel"
 msgstr "Отмена"
 
-#: templates/admin/advanced_filters/change_form.html:16
-msgid "Change advanced filter"
-msgstr "Изменить расширенный фильтр"
-
-#: templates/admin/common_js_init.html:14
+#: .\templates\admin\common_js_init.html:9
 msgid "Add another filter"
 msgstr "Добавить ещё один фильтр"
 
-#: templates/admin/common_js_init.html:15
+#: .\templates\admin\common_js_init.html:10
 msgid "Remove"
 msgstr "Удалить"
+
+msgid "Error validating filter forms"
+msgstr "В одном или более фильтров присутствуют ошибки"
