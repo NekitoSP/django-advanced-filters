@@ -66,16 +66,30 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 			if (current_is_or){
 				self.operator_select
 					.select2('destroy')
-					.val('icontains')
-					.prop("disabled", true);
+					.val('icontains');
+
+				self.operator_select.find('option')
+					.each(function () {
+						if($(this).val() != 'icontains') {
+							$(this).prop('disabled', 'disabled')
+						}
+					});
 				self.on_operator_changed(true);
-				self.query_value.prop("disabled", true)
+				self.query_value
+					.val('-')
+					.prop("readonly", 'readonly');
 			} else {
 				self.operator_select
+					.find('option')
+					.each(function () {
+						$(this).removeAttr('disabled')
+					});
+				self.operator_select
 					.select2({dropdownParent: $(self.row),})
-					.prop("disabled", false);
+					.removeAttr("readonly");
 				self.on_operator_changed(true);
-				self.query_value.prop("disabled", false)
+				self.query_value
+					.removeAttr("readonly");
 			}
 		}
 
