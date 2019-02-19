@@ -3,6 +3,7 @@ import logging
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib.admin.sites import all_sites
 from django.contrib.admin.utils import get_fields_from_path
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
@@ -14,6 +15,16 @@ from braces.views import (CsrfExemptMixin, StaffuserRequiredMixin,
 
 logger = logging.getLogger('advanced_filters.views')
 
+
+def get_django_model_admin(model):
+    """Search Django ModelAdmin for passed model.
+    Returns instance if found, otherwise None.
+    """
+    for admin_site in all_sites:
+        registry = admin_site._registry
+        if model in registry:
+            return registry[model]
+    return None
 
 class GetFieldChoices(CsrfExemptMixin, StaffuserRequiredMixin,
                       JSONResponseMixin, View):
@@ -34,9 +45,22 @@ class GetFieldChoices(CsrfExemptMixin, StaffuserRequiredMixin,
                 status=400)
         app_label, model_name = model.split('.', 1)
         try:
-            model_obj = apps.get_model(app_label, model_name)
+            initial_model_obj = model_obj = apps.get_model(app_label, model_name)
             field = get_fields_from_path(model_obj, field_name)[-1]
             model_obj = field.model  # use new model if followed a ForeignKey
+
+            # Check if field available to display choices
+            model_admin = get_django_model_admin(initial_model_obj)
+            if not model_admin:
+                return self.render_json_response({'error': f"Model Admin not found"}, status=400)
+            adv_filter_form_class = getattr(model_admin, 'advanced_filter_form', None)
+            if not adv_filter_form_class:
+                return self.render_json_response({'error': "No installed app/model: %s" % model}, status=400)
+            adv_filter_form = adv_filter_form_class(model_admin=model_admin)
+            fields = adv_filter_form.get_fields_from_model(initial_model_obj, adv_filter_form._filter_fields)
+            if field_name not in fields:
+                return self.render_json_response({'error': f"Field not found"}, status=400)
+
         except AttributeError as e:
             logger.debug("Invalid kwargs passed to view: %s", e)
             return self.render_json_response(
