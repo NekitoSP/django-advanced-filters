@@ -60,3 +60,6 @@ class AdvancedFilter(models.Model):
         s = QSerializer(base64=True)
         d = s.loads(self.b64_query, raw=True)
         return s.get_field_values_list(d)
+
+    def __str__(self):
+        return self.title
