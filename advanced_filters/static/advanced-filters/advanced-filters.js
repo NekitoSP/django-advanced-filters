@@ -156,7 +156,7 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 			let query_value_clone = self.query_value.clone()
 				.addClass('select2_query')
 				.show();
-			self.query_value.parent().append(query_value_clone);
+			self.query_value.after(query_value_clone);
 			query_value_clone.select2({
 				dropdownParent: $(self.row),
 				// multiple: true, //TODO: подумать над возможностью мультивыбора для типа "One Of"
@@ -209,8 +209,9 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 			})
 			.addClass('query-dt-to form-control form-control-sm');
 
-		self.query_value.parent().prepend($to);
-		self.query_value.parent().prepend($from);
+		self.query_value.after($to);
+		self.query_value.after($from);
+
 		let val = self.query_value.val();
 		if (!val || val === 'null') {
 			self.query_value.val("-");
