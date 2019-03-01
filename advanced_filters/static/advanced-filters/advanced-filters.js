@@ -5,7 +5,7 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 	self.row = $(row);
 	self.row_id = self.row.attr('id');
 	self.operator_select = self.row.find('select.query-operator');
-	self.query_value = self.row.find('input.query-value');
+	self.query_value = self.row.find('select.query-value');
 	self.query_field_name = self.row.find('.query-field');
 	self.debug_mode = debug_mode || true;
 
@@ -16,7 +16,6 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 	};
 
 	self.init = function () {
-
 		if (self.row.hasClass(ADVANCED_FILTER_ROW_CLASS)){
 			console.error('Row already initialized!');
 			return;
@@ -24,14 +23,30 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 
 		self.remove_operators_factory = {
 			'iexact': self.remove_select2,
-			'range': self.remove_datepickers,
+			'icontains': self.remove_select2,
 			'iregex': self.remove_select2,
+			'range': self.remove_datepickers,
+			'isnull': self.remove_static,
+			'istrue': self.remove_static,
+			'isfalse': self.remove_static,
+			'lt': self.remove_select2,
+			'gt': self.remove_select2,
+			'lte': self.remove_select2,
+			'gte': self.remove_select2,
 		};
 
 		self.operators_factory = {
 			'iexact': self.initialize_select2,
+			'icontains': self.initialize_select2_icontains,
+			'iregex': self.initialize_select2_iregex,
 			'range': self.initialize_datepickers,
-			'iregex': self.initialize_select2,
+			'isnull': self.initialize_static,
+			'istrue': self.initialize_static,
+			'isfalse': self.initialize_static,
+			'lt': self.initialize_select2,
+			'gt': self.initialize_select2,
+			'lte': self.initialize_select2,
+			'gte': self.initialize_select2,
 		};
 
 		self.row.addClass(ADVANCED_FILTER_ROW_CLASS);
@@ -136,14 +151,79 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		return factory[operator] || default_handler;
 	};
 
+	self.remove_static = function() {
+		self.query_value.parent().find('.static_text').remove();
+	};
+
+	self.initialize_static = function() {
+		var text = self.operator_select.find('option:selected').text();
+		let static_item = $('<span class="static_text"></span>').text(text);
+		self.query_value.parent().append(static_item)
+	};
+
 	self.initialize_default = function(){
 		self.log('self.initialize_default');
-		self.query_value.show();
+		self.query_value
+			.removeAttr('disabled')
+			.show();
 	};
 
 	self.hide_default = function(){
 		self.log('self.hide_default');
-		self.query_value.hide();
+		self.query_value
+			.attr('disabled', 'disabled')
+			.hide();
+	};
+
+	self.s2_create_tag = function(params){
+		let term = $.trim(params.term);
+		if (term === '') {
+			return null;
+		}
+		return {
+			id: term,
+			text: term,
+			newTag: true,
+		};
+	};
+
+	self.initialize_select2_icontains = function() {
+		self.log('self.initialize_select2_icontains');
+		let query_value_clone = self.query_value.clone()
+			.removeAttr('disabled')
+			.addClass('select2_query')
+			.show();
+		self.query_value.parent().append(query_value_clone);
+		query_value_clone.select2({
+			dropdownParent: $(self.row),
+			tags: true,
+			allowClear: true,
+			createTag: self.s2_create_tag,
+		});
+	};
+
+	self.initialize_select2_iregex = function(){
+		self.log('self.initialize_select2_iregex');
+		let field_name = self.query_field_name.val();
+
+		let choices_url = ADVANCED_FILTER_CHOICES_LOOKUP_URL + (FORM_MODEL || MODEL_LABEL) + '/' + field_name;
+		$.get(choices_url, function(data) {
+			self.log('choices response', {choices_url: choices_url, data: data});
+			let query_value_clone = self.query_value.clone()
+				.removeAttr('disabled')
+				.addClass('select2_query')
+				.show();
+			self.query_value.parent().append(query_value_clone);
+			query_value_clone.select2({
+				dropdownParent: $(self.row),
+				multiple: true,
+				data: data.results,
+				tags: true,
+				createTag: self.s2_create_tag,
+			})
+		}).fail(function() {
+			self.initialize_default();
+		});
 	};
 
 	self.initialize_select2 = function() {
@@ -154,26 +234,20 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		$.get(choices_url, function(data) {
 			self.log('choices response', {choices_url: choices_url, data: data});
 			let query_value_clone = self.query_value.clone()
+				.removeAttr('disabled')
 				.addClass('select2_query')
 				.show();
 			self.query_value.after(query_value_clone);
 			query_value_clone.select2({
 				dropdownParent: $(self.row),
-				// multiple: true, //TODO: подумать над возможностью мультивыбора для типа "One Of"
 				data: data.results,
-				createTag: function (params) {
-					let term = $.trim(params.term);
-					if (term === '') {
-						return null;
-					}
-
-					return {
-					  id: term,
-					  text: term,
-					  newTag: true
-					}
-				},
+				multiple: false,
+				tags: true,
+    			allowClear: true,
+				createTag: self.s2_create_tag,
 			});
+			// debugger;
+
 		}).fail(function() {
 			self.initialize_default();
 		});
@@ -212,16 +286,16 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		self.query_value.after($to);
 		self.query_value.after($from);
 
-		let val = self.query_value.val();
-		if (!val || val === 'null') {
-			self.query_value.val("-");
-		} else {
-			let from_to = val.split(',');
-			if (from_to.length === 2) {
-				$from.val(from_to[0]);
-				$to.val(from_to[1])
-			}
-		}
+		// let val = self.query_value.val();
+		// if (!val || val === 'null') {
+		// 	self.query_value.val("-");
+		// } else {
+		// 	let from_to = val.split(',');
+		// 	if (from_to.length === 2) {
+		// 		$from.val(from_to[0]);
+		// 		$to.val(from_to[1])
+		// 	}
+		// }
 		$from.addClass('hasDatepicker');
 		$to.addClass('hasDatepicker');
 	};
