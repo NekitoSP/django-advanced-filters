@@ -205,6 +205,7 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		query_value_clone.select2({
 			dropdownParent: $(self.row),
 			tags: true,
+			multiple: false,
 			allowClear: true,
 			createTag: self.s2_create_tag,
 		});
