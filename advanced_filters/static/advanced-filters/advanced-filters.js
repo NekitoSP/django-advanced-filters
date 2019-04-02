@@ -64,16 +64,24 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 
 	self.destroy = function(){
 		self.log('self.destroy');
-		let operator = self.operator_select.val();
+		let operator = self.get_current_operator();
 		let remove_handler = self.get_from_factory(self.remove_operators_factory, operator, self.hide_default);
 		remove_handler();
 		self.operator_select.off();
 	};
 
+	self.get_current_operator = function(){
+		return self.operator_select.val();
+	};
+
+	self.get_current_query_field = function(){
+		return self.query_field_name.val();
+	};
+
 	self.on_field_name_changed = function(force){
 		force = force || false;
 		let previous_value = self.query_field_name.data('previous_value');
-		let current_value = self.query_field_name.val();
+		let current_value = self.get_current_query_field();
 		let previous_is_or = previous_value === OR_VALUE;
 		let current_is_or = current_value === OR_VALUE;
 		let is_changed = previous_is_or !== current_is_or;
@@ -111,7 +119,7 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		self.query_field_name.data('previous_value', current_value);
 
 		if (!force) {
-			let operator = self.operator_select.val();
+			let operator = self.get_current_operator();
 			self.recreate_operators(operator, operator)
 		}
 	};
@@ -122,7 +130,7 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		force = !!force;
 
 		let previous_operator = self.operator_select.data('previous_value');
-		let operator = self.operator_select.val();
+		let operator = self.get_current_operator();
 		self.log({
 			previous_operator: previous_operator,
 			operator: operator,
@@ -204,10 +212,17 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 
 	self.initialize_select2_iregex = function(){
 		self.log('self.initialize_select2_iregex');
-		let field_name = self.query_field_name.val();
+		let operator = self.get_current_operator();
+		let field_name = self.get_current_query_field();
 
 		let choices_url = ADVANCED_FILTER_CHOICES_LOOKUP_URL + (FORM_MODEL || MODEL_LABEL) + '/' + field_name;
 		$.get(choices_url, function(data) {
+			let n_operator = self.get_current_operator();
+			let n_field = self.get_current_query_field();
+			if(n_operator !== operator || n_field !==field_name){
+				return;
+			}
+
 			self.log('choices response', {choices_url: choices_url, data: data});
 			let query_value_clone = self.query_value.clone()
 				.removeAttr('disabled')
@@ -222,16 +237,28 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 				createTag: self.s2_create_tag,
 			})
 		}).fail(function() {
+			let n_operator = self.get_current_operator();
+			let n_field = self.get_current_query_field();
+			if(n_operator !== operator || n_field !==field_name){
+				return;
+			}
 			self.initialize_default();
 		});
 	};
 
 	self.initialize_select2 = function() {
 		self.log('self.initialize_select2');
-		let field_name = self.query_field_name.val();
+		let operator = self.get_current_operator();
+		let field_name = self.get_current_query_field();
 
 		let choices_url = ADVANCED_FILTER_CHOICES_LOOKUP_URL + (FORM_MODEL || MODEL_LABEL) + '/' + field_name;
 		$.get(choices_url, function(data) {
+			let n_operator = self.get_current_operator();
+			let n_field = self.get_current_query_field();
+			if(n_operator !== operator || n_field !==field_name){
+				return;
+			}
+
 			self.log('choices response', {choices_url: choices_url, data: data});
 			let query_value_clone = self.query_value.clone()
 				.removeAttr('disabled')
@@ -249,6 +276,12 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 			// debugger;
 
 		}).fail(function() {
+			let n_operator = self.get_current_operator();
+			let n_field = self.get_current_query_field();
+			if(n_operator !== operator || n_field !==field_name){
+				return;
+			}
+
 			self.initialize_default();
 		});
 	};
@@ -286,16 +319,19 @@ let AdvancedFiltersRow = function($, row, debug_mode){
 		self.query_value.after($to);
 		self.query_value.after($from);
 
-		// let val = self.query_value.val();
-		// if (!val || val === 'null') {
-		// 	self.query_value.val("-");
-		// } else {
-		// 	let from_to = val.split(',');
-		// 	if (from_to.length === 2) {
-		// 		$from.val(from_to[0]);
-		// 		$to.val(from_to[1])
-		// 	}
-		// }
+		let val = self.query_value.val();
+		if (Array.isArray(val) && val.length > 0){
+			val = val[0]
+		}
+		if (!val || val === 'null') {
+			self.query_value.val("-");
+		} else {
+			let from_to = val.split(',');
+			if (from_to.length === 2) {
+				$from.val(from_to[0]);
+				$to.val(from_to[1])
+			}
+		}
 		$from.addClass('hasDatepicker');
 		$to.addClass('hasDatepicker');
 	};
