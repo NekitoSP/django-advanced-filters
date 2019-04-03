@@ -6,6 +6,7 @@ from django.contrib.admin.utils import unquote
 from django.http import HttpResponseRedirect
 from django.shortcuts import resolve_url
 from django.utils.translation import ugettext_lazy as _
+from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
 
 from .forms import AdvancedFilterForm
 from .models import AdvancedFilter
@@ -42,6 +43,45 @@ class AdvancedListFilters(admin.SimpleListFilter):
             return queryset.filter(query).distinct()
         return queryset
 
+def _get_query_params(url_str):
+    """
+    Возвращает все get-параметры из URL. В качестве значений параметров - список.
+
+    :param url: исходный URL
+    :return:
+    """
+    url_components = urlparse(url_str)
+    query_params = parse_qs(url_components.query, keep_blank_values=True)
+    return query_params
+
+def _add_query_param(url_str, key, value, replace_existing=True):
+    """
+    Добавляет get-параметр в URL
+    url = 'http://site/'
+    url = add_add_query_param('http://site/', 'hide', None)
+    url = add_add_query_param('http://site/', 'param1', 'value1')
+    http://site/?hide&param1=value1
+
+    :param url: исходный URL
+    :param key: ключ параметра
+    :param value: значение параметра
+    :param replace_existing: перезаписывает значение параметра ТОЛЬКО в случае, если параметр представлен в URL
+    не более одного раза. В противном случае - добавляет новое значение
+    """
+    url = urlparse(url_str)
+    query_params = _get_query_params(url_str)
+    if key in query_params:
+        current_values = query_params[key]
+        if replace_existing and len(current_values) == 1:
+            current_values = [value]
+        else:
+            if value not in query_params:
+                current_values = [*current_values, value]
+        query_params[key] = current_values
+    else:
+        query_params[key] = [value]
+    url = url._replace(query=urlencode(query_params, doseq=True))
+    return urlunparse(url)
 
 class AdminAdvancedFiltersMixin(object):
     """ Generic AdvancedFilters mixin """
@@ -73,10 +113,9 @@ class AdminAdvancedFiltersMixin(object):
                 request, messages.SUCCESS,
                 _('Advanced filter added successfully.')
             )
-            if '_save_goto' in (request.GET or request.POST):
-                url = "{path}{qparams}".format(
-                    path=request.path, qparams="?_afilter={id}".format(
-                        id=afilter.id))
+            if ('_save_goto' in request.GET) or ('_save_goto' in request.POST):
+                url = request.get_full_path()
+                url = _add_query_param(url, '_afilter', afilter.id)
                 return HttpResponseRedirect(url)
         elif request.method == "POST":
             logger.info('Failed saving advanced filter, params: %s', form.data)
@@ -127,7 +166,7 @@ class AdvancedFilterAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         orig_response = super(AdvancedFilterAdmin, self).change_view(
             request, object_id, form_url, extra_context)
-        if '_save_goto' in request.POST:
+        if '_save_goto' in request.POST and isinstance(orig_response, HttpResponseRedirect):
             obj = self.get_object(request, unquote(object_id))
             if obj:
                 app, model = obj.model.split('.')

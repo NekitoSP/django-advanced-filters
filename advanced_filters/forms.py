@@ -156,7 +156,7 @@ class AdvancedFilterQueryForm(CleanWhiteSpacesMixin, forms.Form):
         dtfrom = data.pop('value_from')
         dtto = data.pop('value_to')
         if dtfrom is dtto is None:
-            self.errors['value'] = ['Date range requires values']
+            self.errors['value'] = ['Необходимо указать даты временного диапазона']
             raise forms.ValidationError([])
         data['value'] = (dtfrom, dtto)
 
@@ -366,6 +366,8 @@ class AdvancedFilterForm(CleanWhiteSpacesMixin, forms.ModelForm):
         return AFQFormSetNoExtra if not extra else AFQFormSet
 
     def save(self, commit=True):
+        if not self.instance.title:
+            self.instance.title = AdvancedFilter._meta.verbose_name
         self.instance.query = self.generate_query()
         self.instance.model = self.cleaned_data.get('model')
         return super(AdvancedFilterForm, self).save(commit)

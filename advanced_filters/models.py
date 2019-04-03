@@ -18,7 +18,7 @@ class AdvancedFilter(models.Model):
         verbose_name = _('Advanced Filter')
         verbose_name_plural = _('Advanced Filters')
 
-    title = models.CharField(max_length=255, null=False, blank=False, verbose_name=_('Title'))
+    title = models.CharField(max_length=255, null=False, blank=True, verbose_name=_('Title'))
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='created_advanced_filters',
